@@ -1,5 +1,41 @@
+## Build output
 bin/
 obj/
 /packages/
+
+## .NET
+*.exe
+*.dll
+*.pdb
+*.cache
+*.log
+*.user
+*.suo
+*.csproj.user
+*.aps
+*.ncb
+*.opendb
+*.tgz
+
+## Visual Studio
+.vs/
+*.VC.db
+*.VC.VC.opendb
+
+## JetBrains Rider / ReSharper
 riderModule.iml
 /_ReSharper.Caches/
+.idea/
+
+## macOS
+.DS_Store
+
+## Logs
+logs/
+*.log
+
+## Other
+*.tmp
+*.temp
+*.swp
+*.swo
