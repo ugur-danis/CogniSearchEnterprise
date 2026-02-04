@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3D7A9B95-C811-4B47-9658-3AC0A444EE0A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{63090377-54B8-41EC-8000-29B3C8650FA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentService", "src\Services\DocumentService\DocumentService.csproj", "{72DA9EAD-242E-45E3-ADC1-FD54C2B6C20C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks", "src\BuildingBlocks\BuildingBlocks.csproj", "{2C293F6E-AFDE-4463-BFC1-EEF285F74AA3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{63090377-54B8-41EC-8000-29B3C8650FA0} = {3D7A9B95-C811-4B47-9658-3AC0A444EE0A}
+		{72DA9EAD-242E-45E3-ADC1-FD54C2B6C20C} = {63090377-54B8-41EC-8000-29B3C8650FA0}
+		{2C293F6E-AFDE-4463-BFC1-EEF285F74AA3} = {3D7A9B95-C811-4B47-9658-3AC0A444EE0A}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{72DA9EAD-242E-45E3-ADC1-FD54C2B6C20C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72DA9EAD-242E-45E3-ADC1-FD54C2B6C20C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72DA9EAD-242E-45E3-ADC1-FD54C2B6C20C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72DA9EAD-242E-45E3-ADC1-FD54C2B6C20C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C293F6E-AFDE-4463-BFC1-EEF285F74AA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C293F6E-AFDE-4463-BFC1-EEF285F74AA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C293F6E-AFDE-4463-BFC1-EEF285F74AA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C293F6E-AFDE-4463-BFC1-EEF285F74AA3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
