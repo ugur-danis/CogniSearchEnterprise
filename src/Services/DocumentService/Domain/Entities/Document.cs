@@ -2,7 +2,6 @@ using BuildingBlocks.Core;
 
 namespace DocumentService.Domain.Entities;
 
-// Durumları yönetmek için Enum (Kodun okunabilirliği için şart)
 public enum DocumentStatus
 {
     Uploaded = 0,
@@ -11,7 +10,7 @@ public enum DocumentStatus
     Failed = 3
 }
 
-public class Document : Entity // BaseEntity'den miras aldık
+public class Document : Entity
 {
     public string Title { get; set; } = default!;
     public string FilePath { get; set; } = default!;
@@ -23,15 +22,12 @@ public class Document : Entity // BaseEntity'den miras aldık
     public string? FailureReason { get; set; }
     public Guid UserId { get; set; } // Dosyayı kim yükledi?
 
-    // Boş constructor (EF Core için gereklidir)
     public Document()
     {
     }
 
-    // Yeni kayıt oluştururken kullanacağımız kontrollü metod
     public static Document Create(Guid userId, string title, string filePath, long fileSize, string contentType)
     {
-        // Burada validasyon (doğrulama) yapabilirsin. Örn: Dosya boyutu 0 olamaz.
         if (fileSize <= 0) throw new ArgumentException("Dosya boyutu geçersiz.");
 
         return new Document
@@ -45,7 +41,6 @@ public class Document : Entity // BaseEntity'den miras aldık
         };
     }
 
-    // İşlem durumunu değiştiren metotlar (Encapsulation)
     public void MarkAsProcessing()
     {
         Status = DocumentStatus.Processing;
