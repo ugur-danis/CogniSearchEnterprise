@@ -54,11 +54,22 @@ services:
       - cogni-network
 
   processing-service:
-    image: processing-service
+    build:
+      context: .
+      dockerfile: src/Services/ProcessingService/Dockerfile
     container_name: cogni-processing-service
     environment:
       - AI__GeminiKey=${GEMINI_API_KEY}
       - AI__GeminiModelId=${GEMINI_MODEL_ID}
+      - Elasticsearch__Uri=http://elasticsearch:9200
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin
+    depends_on:
+      - elasticsearch
+      - rabbitmq
+    networks:
+      - cogni-network
 
   document-service:
     build:

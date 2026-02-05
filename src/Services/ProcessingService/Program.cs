@@ -34,7 +34,8 @@ builder.Services.AddScoped<ITextExtractorService, TextExtractorService>();
 // Elasticsearch
 builder.Services.AddSingleton<ElasticsearchClient>(_ =>
 {
-    var settings = new ElasticsearchClientSettings(new Uri("http://localhost:9200"))
+    var uri = builder.Configuration["Elasticsearch:Uri"] ?? "http://localhost:9200";
+    var settings = new ElasticsearchClientSettings(new Uri(uri))
         .DefaultIndex("documents");
     return new ElasticsearchClient(settings);
 });
@@ -46,10 +47,10 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host("localhost", "/", h =>
+        cfg.Host(builder.Configuration["RabbitMQ:Host"] ?? "localhost", "/", h =>
         {
-            h.Username("admin");
-            h.Password("admin");
+            h.Username(builder.Configuration["RabbitMQ:Username"] ?? "admin");
+            h.Password(builder.Configuration["RabbitMQ:Password"] ?? "admin");
         });
         cfg.ConfigureEndpoints(context);
     });
