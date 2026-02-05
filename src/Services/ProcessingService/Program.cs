@@ -1,12 +1,32 @@
 using Elastic.Clients.Elasticsearch;
 using MassTransit;
+using Microsoft.SemanticKernel;
 using ProcessingService.Consumers;
+using ProcessingService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// AI / SEMANTIC KERNEL (GEMINI)
+builder.Services.AddKernel();
+
+// Google Gemini
+var geminiApiKey = builder.Configuration["AI:GeminiKey"];
+var modelId = builder.Configuration["AI:GeminiModelId"];
+if (string.IsNullOrEmpty(geminiApiKey) || string.IsNullOrEmpty(modelId))
+{
+    throw new InvalidOperationException(
+        "API Key or Model Id not found! Please run the command 'dotnet user-secrets set AI:GeminiKey | AI:ModelId ...'.");
+}
+
+builder.Services.AddGoogleAIGeminiChatCompletion(
+    modelId: modelId,
+    apiKey: geminiApiKey
+);
+builder.Services.AddScoped<IAiService, SemanticKernelService>();
 
 // Elasticsearch
 builder.Services.AddSingleton<ElasticsearchClient>(_ =>

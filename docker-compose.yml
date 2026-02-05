@@ -53,6 +53,13 @@ services:
     networks:
       - cogni-network
 
+  processing-service:
+    image: processing-service
+    container_name: cogni-processing-service
+    environment:
+      - AI__GeminiKey=${GEMINI_API_KEY}
+      - AI__GeminiModelId=${GEMINI_MODEL_ID}
+
 networks:
   cogni-network:
     driver: bridge
