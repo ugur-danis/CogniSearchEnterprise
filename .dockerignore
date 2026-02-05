@@ -10,3 +10,9 @@
 **/docker-compose.*.yml
 **/LICENSE
 **/README.md
+**/*\*
+**/*\\*
+**/bin\Debug
+**/bin\\Debug
+**/bin*Debug
+src/Services/DocumentService/bin\Debug
