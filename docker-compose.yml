@@ -60,6 +60,29 @@ services:
       - AI__GeminiKey=${GEMINI_API_KEY}
       - AI__GeminiModelId=${GEMINI_MODEL_ID}
 
+  document-service:
+    build:
+      context: .
+      dockerfile: src/Services/DocumentService/Dockerfile
+    container_name: cogni-document-service
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=CogniDb;Username=admin;Password=Password123!
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin
+      - FileStorage__UploadPath=/app/uploads
+      - FileStorage__AllowedExtensions=.pdf,.txt,.docx
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5001:8080"
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - cogni-network
+
 networks:
   cogni-network:
     driver: bridge
