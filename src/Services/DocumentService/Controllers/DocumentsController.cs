@@ -11,10 +11,15 @@ public class DocumentsController(IDocumentService documentService) : ControllerB
     [HttpPost]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromBody] CreateDocumentDto request)
+    public async Task<IActionResult> Create([FromForm] CreateDocumentDto request)
     {
+        if (request.File.Length == 0)
+        {
+            return BadRequest("File is required");
+        }
+
         var userId = Guid.NewGuid();
-        var documentId = await documentService.CreateDocumentAsync(request, userId);
-        return CreatedAtAction(nameof(Create), new { id = documentId }, new { id = documentId });
+        var result = await documentService.CreateDocumentAsync(request, userId);
+        return Ok(result);
     }
 }

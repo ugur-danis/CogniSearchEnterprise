@@ -2,9 +2,7 @@ namespace DocumentService.DTOs;
 
 public record CreateDocumentDto(
     string Title,
-    string Description,
-    long FileSize,
-    string ContentType
+    IFormFile File
 );
 
 public record DocumentResponseDto(
