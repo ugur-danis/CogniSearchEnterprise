@@ -39,4 +39,4 @@ logs/
 *.temp
 *.swp
 *.swo
-dockerfiles/.env
+.env
