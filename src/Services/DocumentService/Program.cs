@@ -25,21 +25,33 @@ builder.Services.AddDbContext<DocumentDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // RabbitMQ (MassTransit)
+// Exception Handling
+builder.Services.AddExceptionHandler<BuildingBlocks.Middleware.GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+// RabbitMQ (MassTransit)
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<DocumentCompletedConsumer>();
     x.AddConsumer<DocumentProcessingConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host("localhost", "/", h =>
+        cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
         {
-            h.Username("admin");
-            h.Password("admin");
+            h.Username(builder.Configuration["RabbitMQ:Username"]!);
+            h.Password(builder.Configuration["RabbitMQ:Password"]!);
         });
         cfg.ConfigureEndpoints(context);
     });
 });
 
+// Options
+builder.Services.AddOptions<DocumentService.Options.FileStorageOptions>()
+    .Bind(builder.Configuration.GetSection(DocumentService.Options.FileStorageOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddScoped<DocumentService.Services.IFileStorageService, DocumentService.Services.FileStorageService>();
 builder.Services.AddScoped<DocumentService.Services.IDocumentService, DocumentService.Services.DocumentService>();
 
 
@@ -51,5 +63,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.Run();
