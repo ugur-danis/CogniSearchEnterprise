@@ -16,7 +16,7 @@ public class DocumentDbContext(DbContextOptions<DocumentDbContext> options) : Db
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
 
-            // Store enum values as strings in the database for better readability.
+
             entity.Property(e => e.Status).HasConversion<string>();
         });
         modelBuilder.HasDefaultSchema("document");

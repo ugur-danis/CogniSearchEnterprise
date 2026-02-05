@@ -19,7 +19,7 @@ public class DocumentsController(IDocumentService documentService) : ControllerB
             return BadRequest("File is required");
         }
 
-        var userId = Guid.NewGuid(); // In a real app, extract from claims
+        var userId = Guid.NewGuid();
         var result = await documentService.CreateDocumentAsync(request, userId);
 
         if (result.IsSuccess)

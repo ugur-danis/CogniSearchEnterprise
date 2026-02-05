@@ -40,7 +40,7 @@ public class DocumentService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to create document for user {UserId}", userId);
-            throw; // Global Exception Handler will catch this (or we can return Result.Failure)
+            throw;
         }
     }
 
@@ -61,7 +61,7 @@ public class DocumentService(
         catch (Exception e)
         {
             await MarkAsFailedAsync(document.Id, $"Failed to send to the queue: {e.Message}");
-            // In a real scenario, we might want to return a warning or use an Outbox pattern
+
             throw new Exception("The file was uploaded, but it could not be added to the processing queue.", e);
         }
     }

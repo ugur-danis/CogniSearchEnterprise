@@ -7,7 +7,7 @@ using Microsoft.OpenApi;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
-// Swagger
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -20,16 +20,16 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddOpenApi();
 
-// DbContext
+
 builder.Services.AddDbContext<DocumentDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// RabbitMQ (MassTransit)
-// Exception Handling
+
+
 builder.Services.AddExceptionHandler<BuildingBlocks.Middleware.GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-// RabbitMQ (MassTransit)
+
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<DocumentCompletedConsumer>();
@@ -45,7 +45,7 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-// Options
+
 builder.Services.AddOptions<DocumentService.Options.FileStorageOptions>()
     .Bind(builder.Configuration.GetSection(DocumentService.Options.FileStorageOptions.SectionName))
     .ValidateDataAnnotations()
