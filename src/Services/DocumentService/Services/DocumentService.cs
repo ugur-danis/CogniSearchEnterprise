@@ -1,10 +1,16 @@
+using BuildingBlocks.Events;
 using DocumentService.Domain.Entities;
 using DocumentService.DTOs;
 using DocumentService.Infrastructure.Data;
+using MassTransit;
 
 namespace DocumentService.Services;
 
-public class DocumentService(DocumentDbContext context, ILogger<DocumentService> logger) : IDocumentService
+public class DocumentService(
+    DocumentDbContext context,
+    ILogger<DocumentService> logger,
+    IPublishEndpoint publishEndpoint)
+    : IDocumentService
 {
     public async Task<Guid> CreateDocumentAsync(CreateDocumentDto dto, Guid userId)
     {
@@ -19,7 +25,17 @@ public class DocumentService(DocumentDbContext context, ILogger<DocumentService>
         context.Documents.Add(document);
         await context.SaveChangesAsync();
 
-        logger.LogInformation("Document created successfully with ID: {DocumentId}", document.Id);
+        logger.LogInformation("Record inserted: {DocumentId}", document.Id);
+
+        await publishEndpoint.Publish(new DocumentUploadedEvent
+        {
+            Id = document.Id,
+            UserId = userId,
+            Title = document.Title,
+            FilePath = document.FilePath
+        });
+
+        logger.LogInformation("Event published to RabbitMQ: DocumentUploadedEvent");
 
         return document.Id;
     }
