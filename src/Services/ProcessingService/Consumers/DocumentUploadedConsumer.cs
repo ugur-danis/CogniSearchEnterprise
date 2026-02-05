@@ -9,7 +9,9 @@ namespace ProcessingService.Consumers;
 public class DocumentUploadedConsumer(
     ILogger<DocumentUploadedConsumer> logger,
     ElasticsearchClient elasticClient,
-    IAiService aiService)
+    IAiService aiService,
+    ITextExtractorService textExtractor,
+    IPublishEndpoint publishEndpoint)
     : IConsumer<DocumentUploadedEvent>
 {
     public async Task Consume(ConsumeContext<DocumentUploadedEvent> context)
@@ -17,26 +19,31 @@ public class DocumentUploadedConsumer(
         var message = context.Message;
         logger.LogInformation("Document is being processed: {Title}", message.Title);
 
-        const string fileContent = $$"""
-                                     This document is about the {message.Title}. 
-                                     The project is built around modern cloud architectures, microservices, and AI integration.
-                                     "RabbitMQ is used as the message queue, and Elasticsearch as the search engine.
-                                     "The goal is to intelligently manage corporate documents.
-                                     """;
-
-        logger.LogInformation("AI summary is being generated...");
-
-        string aiSummary;
-        try
+        await publishEndpoint.Publish(new DocumentProcessingEvent
         {
-            aiSummary = await aiService.SummarizeAsync(fileContent);
-            logger.LogInformation("AI Summary: {Summary}", aiSummary);
-        }
-        catch (Exception ex)
+            Id = message.Id,
+            StartedAt = DateTime.UtcNow
+        });
+
+        var fileContent = await textExtractor.ExtractTextAsync(message.FilePath);
+
+        if (string.IsNullOrWhiteSpace(fileContent) || fileContent.Length < 10)
         {
-            logger.LogError("AI Error: {Message}. Using default summary.", ex.Message);
-            aiSummary = "Failed to generate automatic summary.";
+            logger.LogWarning("File content is empty or too short, AI summary is skipped.");
+            await publishEndpoint.Publish(new DocumentCompletedEvent
+            {
+                Id = message.Id,
+                CompletedAt = DateTime.UtcNow
+            });
         }
+
+        var contentForAi = fileContent.Length > 5000 ? fileContent[..5000] : fileContent;
+
+        logger.LogInformation("Generating AI summary (Text Length: {Len})...", contentForAi.Length);
+
+        var aiSummary = await aiService.SummarizeAsync(contentForAi);
+
+        logger.LogInformation("AI summary:{AiSummary}", aiSummary);
 
         var indexModel = new DocumentIndexModel
         {
@@ -48,9 +55,15 @@ public class DocumentUploadedConsumer(
             CreatedAt = DateTime.UtcNow
         };
 
-        var response = await elasticClient.IndexAsync(indexModel);
+        await elasticClient.IndexAsync(indexModel);
+        logger.LogInformation("Elastic Index Successfully!");
 
-        if (response.IsValidResponse)
-            logger.LogInformation("✅ Elastic Index Successfully!");
+        await publishEndpoint.Publish(new DocumentCompletedEvent
+        {
+            Id = message.Id,
+            CompletedAt = DateTime.UtcNow
+        });
+
+        logger.LogInformation("DocumentCompletedEvent was fired.");
     }
 }

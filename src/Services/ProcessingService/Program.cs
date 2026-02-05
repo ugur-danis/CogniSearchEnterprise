@@ -28,6 +28,9 @@ builder.Services.AddGoogleAIGeminiChatCompletion(
 );
 builder.Services.AddScoped<IAiService, SemanticKernelService>();
 
+// Text Read
+builder.Services.AddScoped<ITextExtractorService, TextExtractorService>();
+
 // Elasticsearch
 builder.Services.AddSingleton<ElasticsearchClient>(_ =>
 {
