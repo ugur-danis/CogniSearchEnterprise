@@ -1,3 +1,4 @@
+using DocumentService.Consumers;
 using DocumentService.Infrastructure.Data;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,8 @@ builder.Services.AddDbContext<DocumentDbContext>(options =>
 // RabbitMQ (MassTransit)
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<DocumentCompletedConsumer>();
+    x.AddConsumer<DocumentProcessingConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host("localhost", "/", h =>
