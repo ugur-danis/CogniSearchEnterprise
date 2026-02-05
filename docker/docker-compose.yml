@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -12,16 +12,51 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    
+    networks:
+      - cogni-network
+
   rabbitmq:
-    image: rabbitmq:3-management-alpine # The ‘management’ tag for admin panel (UI)
+    image: rabbitmq:3-management-alpine
     container_name: cogni-rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
     ports:
-      - "5672:5672"   # Applications connect here
-      - "15672:15672" # Access the management panel from your browser here
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - cogni-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
+    container_name: cogni-elastic
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    networks:
+      - cogni-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.3.0
+    container_name: cogni-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - cogni-network
+
+networks:
+  cogni-network:
+    driver: bridge
 
 volumes:
   postgres_data:
+  elastic_data:

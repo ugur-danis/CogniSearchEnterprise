@@ -1,22 +1,42 @@
 using BuildingBlocks.Events;
+using Elastic.Clients.Elasticsearch;
 using MassTransit;
+using ProcessingService.Models;
 
 namespace ProcessingService.Consumers;
 
-public class DocumentUploadedConsumer(ILogger<DocumentUploadedConsumer> logger) : IConsumer<DocumentUploadedEvent>
+public class DocumentUploadedConsumer(ILogger<DocumentUploadedConsumer> logger, ElasticsearchClient elasticClient)
+    : IConsumer<DocumentUploadedEvent>
 {
     public async Task Consume(ConsumeContext<DocumentUploadedEvent> context)
     {
         var message = context.Message;
+        logger.LogInformation("Processing document: {Title}", message.Title);
 
-        logger.LogInformation("[ProcessingService] New file detected! ID: {Id}, Title: {Title}", message.Id,
-            message.Title);
+        // TODO: Use AI to process/read the text here.
+        var simulatedContent =
+            $"This document is about {message.Title}. Its content includes artificial intelligence and backend topics.";
+        const string simulatedSummary = "Automatically generated summary by artificial intelligence.";
 
-        // TODO: Gerçekte burada Semantic Kernel ile PDF okuyup özet çıkaracağız.
-        // Let’s wait 5 seconds here as if the AI were working (Simulation).
-        logger.LogInformation("Starting AI analysis...");
-        await Task.Delay(5000);
+        var indexModel = new DocumentIndexModel
+        {
+            Id = message.Id,
+            UserId = message.UserId,
+            Title = message.Title,
+            Description = simulatedSummary,
+            Content = simulatedContent,
+            CreatedAt = DateTime.UtcNow
+        };
 
-        logger.LogInformation("AI analysis completed. Vectors have been generated.");
+        var response = await elasticClient.IndexAsync(indexModel);
+        if (response.IsValidResponse)
+        {
+            logger.LogInformation("The document was successfully indexed into Elasticsearch! Index: {Index}",
+                response.Index);
+        }
+        else
+        {
+            logger.LogError("Elasticsearch error: {DebugInformation}", response.DebugInformation);
+        }
     }
 }
